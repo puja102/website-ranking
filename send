@@ -1,0 +1,98 @@
+</body>
+</html>
+<html>
+<head>
+<?php
+$grst= $_GET["id"];
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "nexty";
+
+
+ function file_get_contents_curl($url)
+{
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+    $data = curl_exec($ch);
+    curl_close($ch);
+
+    return $data;
+} ?>
+
+<?php
+/// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT * FROM telmp  WHERE id='$grst' ";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0) {
+    // output data of each row
+    while($row = mysqli_fetch_assoc($result)) {
+        
+ $newrlb =$row["url_st"] ;  ?>
+
+ <a href="<?php echo $newrlb ; ?>"> <?php echo $neme =$row["name"] ?> </a><?php  
+	$html = file_get_contents_curl($newrlb);
+
+//parsing begins here:
+$doc = new DOMDocument();
+@$doc->loadHTML($html);
+$nodes = $doc->getElementsByTagName('title');
+
+//get and display what you need:
+$title = $nodes->item(0)->nodeValue;
+
+$metas = $doc->getElementsByTagName('meta');
+
+for ($i = 0; $i < $metas->length; $i++)
+{
+    $meta = $metas->item($i);
+    if($meta->getAttribute('name') == 'description')
+        $description = $meta->getAttribute('content');
+    if($meta->getAttribute('name') == 'keywords')
+        $keywords = $meta->getAttribute('content');
+}
+
+echo "Title: $title". '<br/><br/>';
+echo "Description: $description". '<br/><br/>';
+echo "Keywords: $keywords";
+
+		
+
+    } ?><script>function gio()
+        {
+            popup = window.open('<?php echo $newrlb;  ?>', 'width=200,height=100');         
+            setTimeout("window.open('http://localhost/mut/nep.php?id=<?php echo $grst+1 ; ?>', '_parent')",60000);
+        }  
+
+     
+   
+</script> <?php
+} else {
+    echo "0 results";  ?><script>
+setTimeout("window.open('http://localhost/mut/nep.php?id=1', '_parent')",6000);
+   
+</script> <?php
+}
+
+mysqli_close($conn);
+
+ 
+?>
+</head>
+<body onLoad=" gio();">
+</body>
+</html>
+<html>
